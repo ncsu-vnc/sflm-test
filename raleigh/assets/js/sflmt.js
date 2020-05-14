@@ -40,22 +40,7 @@
 * atlasesPerTex: number of atlases to include in each texture
 **/
 
-//For Leaflet main map layer
-var baseLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    maxZoom: 18,
-    id: 'mapbox.dark',
-    accessToken: 'pk.eyJ1Ijoic3RodWFuZyIsImEiOiJjaml2eG01OTYyeWhvM3ZyZnkyMGFnb3BtIn0.SrOe7OxYc1nIC754KJJgtw'
-});
 
-if (document.getElementById('streetmap') !== null) {
-    var map = L.map('streetmap', {
-  center: new L.LatLng(35.7796, -78.6382), //raleigh
-  zoomControl: false,
-  zoom: 13,
-  layers: [baseLayer]
-})
-};
 
 
 function Config() {
@@ -2864,6 +2849,27 @@ function scale(arr) {
   }
   return centered;
 }
+
+/**
+* Leaflet
+**/
+
+//For Leaflet main map layer
+var baseLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.dark',
+    accessToken: 'pk.eyJ1Ijoic3RodWFuZyIsImEiOiJjaml2eG01OTYyeWhvM3ZyZnkyMGFnb3BtIn0.SrOe7OxYc1nIC754KJJgtw'
+});
+
+if (document.getElementById('streetmap') !== null) {
+    var map = L.map('streetmap', {
+  center: new L.LatLng(35.7796, -78.6382), //raleigh
+  zoomControl: false,
+  zoom: 13,
+  layers: [baseLayer]
+})
+};
 
 /**
 * Main
