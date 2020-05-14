@@ -2862,13 +2862,21 @@ var baseLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.pn
 });
 
 if (document.getElementById('streetmap') !== null) {
-    var map = L.map('streetmap', {
+    var streetmap = L.map('streetmap', {
   center: new L.LatLng(35.7796, -78.6382), //raleigh
   zoomControl: false,
   zoom: 13,
   layers: [baseLayer]
 })
 };
+
+L.control.scale({
+  position: 'bottomright'
+}).addTo(streetmap);
+
+L.control.zoom({
+  position: 'topright'
+}).addTo(streetmap);
 
 /**
 * Main
