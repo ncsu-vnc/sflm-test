@@ -4,6 +4,23 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet'>
     <link rel='stylesheet' type='text/css' href='assets/css/no-ui-slider.css'>
     <link rel='stylesheet' type='text/css' href='assets/css/style.css'>
+    
+    <!--
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+   -->
+   
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <!--
+  <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+    -->
+    
+    <link rel="stylesheet" type="text/css" href="assets/vendor/src/leaflet/leaflet.css">
+    <script type="text/javascript" src="assets/vendor/src/leaflet/leaflet.js"></script>
+    
     <title>Street Feature-Location Mapping Tool</title>
     <meta charset='utf-8'/>
     <meta name='author' content=''>
@@ -346,11 +363,13 @@
 
     <!-- Header -->
     <header id='header' class='no-highlight'>
-      <a href='https://dhlab.yale.edu' target='_blank'>
+      <a href='https://www.visualnarrative.ncsu.edu/' target='_blank'>
         <img id='logo' src='assets/images/up-logo.png' alt='UP logo' />
       </a>
       <div id='app-name'>Street Feature-Location Mapping Tool</div>
-      <div id='header-controls'>
+      
+      <!--
+       <div id='header-controls'>
         <div id='range-slider'>
           <label>Point Size</label>
           <input id='pointsize-range-input' min='0' max='0.03' value='0' step='0.00001' type='range' />
@@ -364,12 +383,15 @@
         <div id='filters'></div>
         <div id='date-slider'></div>
       </div>
+      -->
     </header>
     <!-- Loader -->
     <div id='loader-scene'>
-      <p class='welcome'>This page visualizes a large image collection within an interactive WebGL scene. Each image was processed with an <a href='https://arxiv.org/abs/1409.4842' target='_blank'>Inception</a> Convolutional Neural Network, trained on <a href='http://image-net.org/challenges/LSVRC/2012/' target='_blank'>ImageNet 2012</a>, and projected into a two-dimensional manifold with the <a href='https://github.com/lmcinnes/umap' target='_blank'>UMAP</a> algorithm such that similar images appear proximate to one another.</p>
+      <p class='welcome'>Data visualization tools utilized by historians, urban scholars, architects, and community stakeholders, to assess urban change at the street level in modern cities.</p>
       <div class='loader-container'>
         <div class='loader-icon'>
+
+         <!--
           <div class='blocks'>
             <div class='block'></div>
             <div class='block'></div>
@@ -381,6 +403,7 @@
             <div class='block'></div>
             <div class='block'></div>
           </div>
+			-->
         </div>
         <div id='loader-text'>
           <span id='progress'>0%</span>
@@ -390,32 +413,53 @@
     </div>
     <!-- Canvas -->
 
-    <div id='canvas-container'>
+   <!-- photomap div -->
+    <div id='photomap-canvas-container'>
+       <div id='photomap-controls-container'>
+        <div id='range-slider'>
+          <label>Point Size</label>
+          <input id='pointsize-range-input' min='0' max='0.03' value='0.0' step='0.00001' type='range' />
+        </div>
+        <div id='icons'>
+         <!--
+          <img id='layout-date' src='assets/images/icons/date-layout.svg' />
+          <img id='layout-grid' src='assets/images/icons/az-layout.svg' />
+          -->
+          <img id='layout-umap' src='assets/images/icons/scatter-layout.svg' />
+          <img id='layout-rasterfairy' src='assets/images/icons/grid-layout.svg' />
+        </div>
+        <div id='filters'></div>
+        <div id='date-slider'></div>
+      </div>
+     
       <div id='jitter-container'>
         <input type='checkbox' id='jitter-input'>
-        <label>Jitter</label>
+        <label>Jitter</label>     
       </div>
+      
       <div id='canvas-target'>
         <canvas id='pixplot-canvas' />
       </div>
+      
+      <div id='selection-icons' class='no-highlight'>
+      	<img id='pan' src='assets/images/icons/pan.svg' class='active' />
+      	<img id='select' src='assets/images/icons/select-box.svg' class='' />
+      </div>
     </div>
-    <!-- Hotspot Navigation -->
+    
+    <!-- streetmap div -->
+    <div id='streetmap-canvas-container'>
+    	<div id='canvas-target'>
+			<div id="streetmap">
+			</div>
+		</div>
+	</div>
+   
+   
+    <!--
     <nav>
-      <!--<div class='nav-inner no-highlight'>-->
-        <!--<h2>Hotspots</h2>-->
-        <!--<div id='hotspots'></div>-->
-        <!--
-        <script type='text/html' id='hotspot-template'>
-          <% _.forEach(hotspots, function(hotspot) { %>
-            <div class='hotspot'>
-              <img src='data/thumbs/<%= hotspot.img %>'>
-              <div><%= hotspot.label %></div>
-            </div>
-          <% }); %>
-        </script>
-      -->
-      <!--</div>-->
     </nav>
+    -->
     <!-- Image Picker: single image selection -->
     <script type='text/html' id='selected-image-template'>
       <div class='modal-content'>
@@ -459,10 +503,7 @@
       <div id='count-target'>0</div>
       <div>images selected</div>
     </div>
-    <div id='selection-icons' class='no-highlight'>
-      <img id='pan' src='assets/images/icons/pan.svg' class='active' />
-      <img id='select' src='assets/images/icons/lasso.png' class='' />
-    </div>
+
     <div id='view-selected'>View Selected</div>
     <div id='selected-images-modal'>
       <div class='modal-content'>
@@ -511,6 +552,13 @@
     <noscript>
       <span class='browser-message'>Sorry, your browser is not able to load a WebGL scene currently. Please enable JavaScript and try again.</span>
     </noscript>
+    
+    <!--
+    <link rel="stylesheet" type="text/css" href="assets/vendor/src/leaflet/leaflet.css">
+    <script type="text/javascript" src="assets/vendor/src/leaflet/leaflet.js"></script>
+    -->
+    
+    
     <script type='text/javascript' src='assets/vendor/dist/three.min.js'></script>
     <script type='text/javascript' src='assets/vendor/dist/lodash.min.js'></script>
     <script type='text/javascript' src='assets/js/object-assign-polyfill.js'></script>

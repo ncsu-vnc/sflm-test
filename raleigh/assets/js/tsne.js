@@ -40,6 +40,24 @@
 * atlasesPerTex: number of atlases to include in each texture
 **/
 
+//For Leaflet main map layer
+var baseLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.dark',
+    accessToken: 'pk.eyJ1Ijoic3RodWFuZyIsImEiOiJjaml2eG01OTYyeWhvM3ZyZnkyMGFnb3BtIn0.SrOe7OxYc1nIC754KJJgtw'
+});
+
+if (document.getElementById('streetmap') !== null) {
+    var map = L.map('streetmap', {
+  center: new L.LatLng(35.7796, -78.6382), //raleigh
+  zoomControl: false,
+  zoom: 13,
+  layers: [baseLayer]
+})
+};
+
+
 function Config() {
   this.data = {
     dir: 'data',
@@ -139,7 +157,6 @@ Data.prototype.parseManifest = function(json) {
   this.atlasCount = json.atlas.count;
   this.textureCount = Math.ceil(json.atlas.count / config.atlasesPerTex);
   this.layouts = json.layouts;
-  this.hotspots = new Hotspots();
   layout.init(Object.keys(this.layouts));
   // load the filter options if metadata present
   if (json.metadata) filters.loadFilters();
@@ -513,7 +530,6 @@ Layout.prototype.init = function(options) {
   }
   this.addEventListeners();
   this.selectActiveIcon();
-  data.hotspots.showHide();
   layout.showHideJitter();
 }
 
@@ -648,8 +664,6 @@ Layout.prototype.setText = function() {
 Layout.prototype.onTransitionComplete = function() {
   // re-enable interactions with the jitter button
   this.elems.container.classList.remove('disabled');
-  // show/hide the hotspots
-  data.hotspots.showHide();
   // update the state and buffers for each cell
   data.cells.forEach(function(cell) {
     cell.x = cell.tx;
@@ -2540,36 +2554,6 @@ function Filter(obj) {
 }
 
 /**
-* Hotspots
-**/
-
-function Hotspots() {
-  this.template = find('#hotspot-template');
-  this.target = find('#hotspots');
-  this.init();
-}
-
-Hotspots.prototype.init = function() {
-  get(getPath(data.json.centroids), function(json) {
-    this.json = json;
-    this.target.innerHTML = _.template(this.template.innerHTML)({
-      hotspots: this.json,
-    });
-    var hotspots = findAll('.hotspot');
-    for (var i=0; i<hotspots.length; i++) {
-      hotspots[i].addEventListener('click', function(idx) {
-        world.flyToCellImage(data.hotspots.json[idx].img);
-      }.bind(this, i))
-    }
-  }.bind(this))
-}
-
-Hotspots.prototype.showHide = function() {
-  c = ['umap'].indexOf(layout.selected) > -1 ? '' : 'disabled';
-  document.querySelector('nav').className = c;
-}
-
-/**
 * Assess WebGL parameters
 **/
 
@@ -2650,6 +2634,9 @@ function Welcome() {
 }
 
 Welcome.prototype.onButtonClick = function(e) {
+	
+	 this.startWorld();
+	/*
   if (e.target.className.indexOf('active') > -1) {
     requestAnimationFrame(function() {
       this.removeLoader(function() {
@@ -2657,9 +2644,12 @@ Welcome.prototype.onButtonClick = function(e) {
       }.bind(this));
     }.bind(this));
   }
+  */
 }
 
+/*
 Welcome.prototype.removeLoader = function(onSuccess) {
+
   var blocks = document.querySelectorAll('.block');
   for (var i=0; i<blocks.length; i++) {
     setTimeout(function(i) {
@@ -2670,8 +2660,10 @@ Welcome.prototype.removeLoader = function(onSuccess) {
       }.bind(this, i), 1000)
     }.bind(this, i), i*100)
   }
+
   document.querySelector('#progress').style.opacity = 0;
 }
+*/
 
 Welcome.prototype.updateProgress = function() {
   var progress = valueSum(data.textureProgress) / data.textureCount;
@@ -2697,9 +2689,10 @@ Welcome.prototype.startWorld = function() {
     setTimeout(function() {
       requestAnimationFrame(function() {
         document.querySelector('#loader-scene').classList += 'hidden';
-        document.querySelector('#header-controls').style.opacity = 1;
+        //document.querySelector('#header-controls').style.opacity = 1;
+		  document.querySelector('#photomap-controls-container').style.opacity = 1;
       })
-    }, 1500)
+    }, 500)
   }.bind(this))
 }
 
