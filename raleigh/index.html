@@ -4,15 +4,15 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,400,600' rel='stylesheet'>
     <link rel='stylesheet' type='text/css' href='assets/css/no-ui-slider.css'>
     <link rel='stylesheet' type='text/css' href='assets/css/style.css'>
-    <title>Visualizing Image Fields</title>
+    <title>Street Feature-Location Mapping Tool</title>
     <meta charset='utf-8'/>
-    <meta name='author' content='Douglas Duhaime'>
+    <meta name='author' content=''>
   </head>
   <body>
     <!-- version: 0.0.84 -->
     <script type='x-shader/x-vertex' id='vertex-shader'>
     /**
-    * The vertex shader's main() function must define `gl_Position`,
+    * The vertex shader's main() function must define `gl_Position
     * which describes the position of each vertex in screen coordinates.
     *
     * To do so, we can use the following variables defined by Three.js:
@@ -347,9 +347,9 @@
     <!-- Header -->
     <header id='header' class='no-highlight'>
       <a href='https://dhlab.yale.edu' target='_blank'>
-        <img id='logo' src='assets/images/dhlab-logo.svg' alt='DHLab logo' />
+        <img id='logo' src='assets/images/up-logo.png' alt='UP logo' />
       </a>
-      <div id='app-name'>PixPlot</div>
+      <div id='app-name'>Street Feature-Location Mapping Tool</div>
       <div id='header-controls'>
         <div id='range-slider'>
           <label>Point Size</label>
@@ -389,6 +389,7 @@
       <button id='enter-button'>Enter</button>
     </div>
     <!-- Canvas -->
+
     <div id='canvas-container'>
       <div id='jitter-container'>
         <input type='checkbox' id='jitter-input'>
@@ -400,9 +401,10 @@
     </div>
     <!-- Hotspot Navigation -->
     <nav>
-      <div class='nav-inner no-highlight'>
-        <h2>Hotspots</h2>
-        <div id='hotspots'></div>
+      <!--<div class='nav-inner no-highlight'>-->
+        <!--<h2>Hotspots</h2>-->
+        <!--<div id='hotspots'></div>-->
+        <!--
         <script type='text/html' id='hotspot-template'>
           <% _.forEach(hotspots, function(hotspot) { %>
             <div class='hotspot'>
@@ -411,7 +413,8 @@
             </div>
           <% }); %>
         </script>
-      </div>
+      -->
+      <!--</div>-->
     </nav>
     <!-- Image Picker: single image selection -->
     <script type='text/html' id='selected-image-template'>
@@ -518,15 +521,5 @@
     <script type='text/javascript' src='assets/vendor/dist/papaparse.min.js'></script>
     <script type='text/javascript' src='assets/vendor/dist/no-ui-slider.min.js'></script>
     <script type='text/javascript' src='assets/js/tsne.js'></script>
-    <!--
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-      ga('create', 'UA-101732875-1', 'auto');
-      ga('send', 'pageview');
-    </script>
-  -->
   </body>
 </html>
