@@ -628,11 +628,11 @@ Layout.prototype.recenterCamera = function(enableDelay) {
 Layout.prototype.setPointScalar = function() {
   var size = false, // size for points
       l = this.selected; // selected layout
-  if (l == 'tsne' || l == 'umap') size = config.size.points.scatter;
+  if (l == 'tsne' || l == 'umap') size = config.size.points.scatter; //world.elems.pointSize.value // config.size.points.scatter
   if (l == 'grid' || l == 'rasterfairy') size = config.size.points.grid;
   if (l == 'date') size = config.size.points.date;
   if (size) {
-    world.elems.pointSize.value = size;
+    world.elems.pointSize.value = config.size.points.initial; //config.size.points.initial //size
     world.setUniform('scaleTarget', world.getPointScale());
   }
 }
