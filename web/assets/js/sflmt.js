@@ -46,6 +46,7 @@ function Config() {
   this.data = {
     dir: 'data',
     file: 'manifest.json',
+    buildingsLatLongFile: 'raleigh-buildings-10000.json',
     gzipped: false,
   }
   this.size = {
@@ -201,6 +202,30 @@ Data.prototype.addCells = function(positions) {
   }
   // add the cells to a searchable LOD texture
   lod.indexCells();
+}
+
+/**
+ * BuildingsLatLong: Container for images and their corresponding latlong values 
+ **/
+
+function BuildingsLatLong() {
+  this.buildings = {}; 
+  this.previousLeafletMarkers = {};
+  this.load(); 
+}
+
+BuildingsLatLong.prototype.load = function() {
+  get(getPath(config.data.dir + '/' + config.data.buildingsLatLongFile),
+    function(json) {
+      this.json = json; 
+      for (var i=0; i<this.json.length; i++) {
+        this.buildings[this.json[i].image] = this.json[i].latlong; 
+      }
+    }.bind(this),
+    function(err) {
+      console.warn('ERROR: could not load raleigh-buildings-10000.json')
+    }.bind(this)
+  )
 }
 
 /**
@@ -1627,6 +1652,38 @@ Selection.prototype.getSelectedImageIndices = function() {
   return l;
 }
 
+// update markers on leaflet map based on selection box 
+Selection.prototype.updateLeafletMarkers = function() {
+    var imagesIndices = this.getSelectedImageIndices();
+    console.log(imagesIndices); 
+    var newLeafletMarkers = {}; 
+
+    for (var i=0; i<imagesIndices.length; i++) {
+      // if already on the map, remove it from old group and add to new 
+      var imageIndex = imagesIndices[i];
+      var marker = buildingsLatLong.previousLeafletMarkers[imageIndex];
+      if (marker) {
+        newLeafletMarkers[imageIndex] = marker; 
+        delete buildingsLatLong.previousLeafletMarkers[imageIndex];
+      } else {
+        var imageName = data.json.images[imageIndex];
+        var latlong = buildingsLatLong.buildings[imageName];
+        var circleMarker = L.circleMarker(latlong, {
+          color: '#3388ff'
+        }).addTo(streetmap);
+        newLeafletMarkers[imageIndex] = circleMarker; 
+      }
+    }
+
+    // the remaining markers in previousLeafletMarkers should be removed from map  
+    for (var key in buildingsLatLong.previousLeafletMarkers) {
+      var marker = buildingsLatLong.previousLeafletMarkers[key];
+      streetmap.removeLayer(marker);
+    }
+
+    buildingsLatLong.previousLeafletMarkers = newLeafletMarkers; 
+}
+
 // return a boolean indicating whether the user has selected any cells
 Selection.prototype.hasSelection = function() {
   return this.getSelectedImages().length > 0;
@@ -1669,6 +1726,7 @@ Selection.prototype.update = function() {
   }
   // if there are no selected cells, exit
   var selected = this.getSelectedImageIndices();
+  this.updateLeafletMarkers(); 
   var elem = document.querySelector('#n-images-selected');
   if (elem) elem.textContent = selected.length;
   if (!selected.length) {
@@ -2878,6 +2936,8 @@ L.control.zoom({
   position: 'topright'
 }).addTo(streetmap);
 
+var layerGroup = L.layerGroup().addTo(streetmap);
+
 /**
 * Main
 **/
@@ -2898,3 +2958,4 @@ var text = new Text();
 var dates = new Dates();
 var lod = new LOD();
 var data = new Data();
+var buildingsLatLong = new BuildingsLatLong();
