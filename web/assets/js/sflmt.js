@@ -1655,7 +1655,6 @@ Selection.prototype.getSelectedImageIndices = function() {
 // update markers on leaflet map based on selection box 
 Selection.prototype.updateLeafletMarkers = function() {
     var imagesIndices = this.getSelectedImageIndices();
-    console.log(imagesIndices); 
     var newLeafletMarkers = {}; 
 
     for (var i=0; i<imagesIndices.length; i++) {
@@ -1669,8 +1668,12 @@ Selection.prototype.updateLeafletMarkers = function() {
         var imageName = data.json.images[imageIndex];
         var latlong = buildingsLatLong.buildings[imageName];
         var circleMarker = L.circleMarker(latlong, {
-          color: '#3388ff'
+          color: '#3388ff',
+          title: imageName
         }).addTo(streetmap);
+
+        var imagePath = config.data.dir + "/thumbs/" + imageName; 
+        circleMarker.bindPopup("<img src=" + imagePath + " style= 'height: 100%; width: 100%; object-fit: contain'/>" + imageName);
         newLeafletMarkers[imageIndex] = circleMarker; 
       }
     }
