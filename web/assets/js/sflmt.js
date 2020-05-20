@@ -1668,7 +1668,9 @@ Selection.prototype.updateLeafletMarkers = function() {
         var imageName = data.json.images[imageIndex];
         var latlong = buildingsLatLong.buildings[imageName];
         var circleMarker = L.circleMarker(latlong, {
-          color: '#3388ff',
+          color: '#eab755', 
+          radius: 7, 
+          weight: 2, 
           title: imageName
         }).addTo(streetmap);
 
