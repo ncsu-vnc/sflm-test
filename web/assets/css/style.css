@@ -910,15 +910,17 @@ noscript {
   bottom: 10px;
   right: 12px;
   display: inline-block;
-  width: 30px;
+  width: 65px;
   padding: 0 5px;
   background: #222;
   border-radius: 4px;
 }
 
 #selection-icons img {
-  display: block;
-  padding: 7px;
+  position: relative; 
+  top: 3px; 
+  left: 1px; 
+  padding: 5px;
   background: lightgray;
   border-radius: 6px;
   max-width: 100%;
