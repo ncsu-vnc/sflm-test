@@ -902,7 +902,7 @@ noscript {
 }
 
 /**
-* Multi-image Selection
+* Multi-image Selection TNSE Panel 
 **/
 
 #selection-icons {
@@ -935,6 +935,45 @@ noscript {
 }
 
 #selection-icons img:hover {
+  background: #eab755;
+  opacity: 1.0;
+}
+
+/**
+* Multi-image Selection Leaflet Panel 
+**/
+
+#selection-icons-leaflet {
+  position: absolute;
+  top: 70px;
+  right: 12px;
+  display: inline-block;
+  width: 65px;
+  padding: 0 5px;
+  background: #222;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+#selection-icons-leaflet img {
+  position: relative; 
+  top: 3px; 
+  left: 1px; 
+  padding: 5px;
+  background: lightgray;
+  border-radius: 6px;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 5px 0;
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+#selection-icons-leaflet img.active {
+  opacity: 1.0;
+}
+
+#selection-icons-leaflet img:hover {
   background: #eab755;
   opacity: 1.0;
 }

@@ -434,9 +434,12 @@
     
     <!-- streetmap div -->
     <div id='streetmap-canvas-container'>
-    	<div id='canvas-target'>
-			<div id="streetmap">
-			</div>
+      <div id='canvas-target'></div>
+      <div id='streetmap'></div>
+      <div id='selection-icons-leaflet' class='no-highlight'>
+      	<img id='pan-leaflet' src='assets/images/icons/pan.svg' class='active' />
+      	<img id='select-leaflet' src='assets/images/icons/select-box.svg' class='' />
+      </div>
 		</div>
 	</div>
    
@@ -539,6 +542,7 @@
     </noscript>
 
     <script type="text/javascript" src='assets/libs/leaflet/leaflet.js'></script>
+    <script type="text/javascript" src='assets/libs/leaflet/Leaflet.SelectAreaFeature.js'></script>
     <script type='text/javascript' src='assets/libs/three.min.js'></script>
     <script type='text/javascript' src='assets/libs/lodash.min.js'></script>
     <script type='text/javascript' src='assets/libs/object-assign-polyfill.js'></script>

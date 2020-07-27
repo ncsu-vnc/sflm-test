@@ -585,8 +585,10 @@ Layout.prototype.set = function(layout, enableDelay) {
   world.state.transitioning = true;
   // set the selected layout
   this.selected = layout;
-  // set the world mode back to pan
-  world.setMode('pan');
+  // set the world mode back to pan in photomap canvas
+  world.setModePhotomap('pan');
+  // set the world mode back to pan in leaflet canvas
+  world.setModeLeaflet('pan-leaflet');
   // select the active tab
   this.selectActiveIcon();
   // set the point size given the selected layout
@@ -709,6 +711,7 @@ Layout.prototype.onTransitionComplete = function() {
 
 function World() {
   this.canvas = document.querySelector('#pixplot-canvas');
+  this.leafletCanvas = document.querySelector('#streetmap');
   this.scene = this.getScene();
   this.camera = this.getCamera();
   this.renderer = this.getRenderer();
@@ -899,6 +902,8 @@ World.prototype.addLostContextListener = function() {
 World.prototype.addModeChangeListeners = function() {
   document.querySelector('#pan').addEventListener('click', this.handleModeIconClick.bind(this));
   document.querySelector('#select').addEventListener('click', this.handleModeIconClick.bind(this));
+  document.querySelector('#pan-leaflet').addEventListener('click', this.handleModeIconClick.bind(this));
+  document.querySelector('#select-leaflet').addEventListener('click', this.handleModeIconClick.bind(this));
 }
 
 /**
@@ -1388,8 +1393,10 @@ World.prototype.init = function() {
   this.handleResize();
   // initialize the first frame
   this.render();
-  // set the mode
-  this.setMode('pan');
+  // set the mode in photomap canvas
+  this.setModePhotomap('pan');
+  // set the mode in leaflet canvas
+  this.setModeLeaflet('pan-leaflet');
   // set the display boolean
   world.state.displayed = true;
 }
@@ -1399,16 +1406,17 @@ World.prototype.init = function() {
 **/
 
 World.prototype.handleModeIconClick = function(e) {
-  this.setMode(e.target.id);
+  this.setModePhotomap(e.target.id);
+  this.setModeLeaflet(e.target.id);
 }
 
 /**
-* Toggle the current world 'mode':
+* Toggle the current world 'mode' in photomap canvas:
 *   'pan' means we're panning through x, y coords
 *   'select' means we're selecting cells to analyze
 **/
 
-World.prototype.setMode = function(mode) {
+World.prototype.setModePhotomap = function(mode) {
   this.mode = mode;
   // update the ui buttons to match the selected mode
   var elems = document.querySelectorAll('#selection-icons img');
@@ -1420,12 +1428,89 @@ World.prototype.setMode = function(mode) {
     this.controls.noPan = false;
     this.canvas.classList.remove('select');
     this.canvas.classList.add('pan');
+    mapSelection.disable();
+    mapSelection.removeAllArea(); 
   } else if (this.mode == 'select') {
     this.controls.noPan = true;
     this.canvas.classList.remove('pan');
     this.canvas.classList.add('select');
+    mapSelection.disable();
+    mapSelection.removeAllArea(); 
     selection.start();
   }
+}
+
+/**
+* Toggle the current world 'mode' in leaflet canvas:
+*   'pan' means we're panning through x, y coords
+*   'select' means we're selecting cells to analyze
+**/
+
+World.prototype.setModeLeaflet = function(mode) {
+  this.mode = mode;
+  // update the ui buttons to match the selected mode
+  var elems = document.querySelectorAll('#selection-icons-leaflet img');
+  for (var i=0; i<elems.length; i++) {
+    elems[i].className = elems[i].id == mode ? 'active' : '';
+  }
+  // update internal state to reflect selected mode
+  if (this.mode == 'pan-leaflet') {
+    this.controls.noPan = false;
+    this.leafletCanvas.classList.remove('select-leaflet');
+    this.leafletCanvas.classList.add('pan-leaflet');
+    mapSelection.disable(); 
+    //mapSelection.removeAllArea(); 
+  } else if (this.mode == 'select-leaflet') {
+    this.controls.noPan = true;
+    this.leafletCanvas.classList.remove('pan-leaflet');
+    this.leafletCanvas.classList.add('select-leaflet');
+    mapSelection.enable();
+  }
+}
+
+/**
+ * Selection for leaflet: handle drag to select map region 
+**/
+
+function LeafletSelection() {
+}
+
+LeafletSelection.prototype.init = function() {
+}
+
+LeafletSelection.prototype.updateSelectedIndices = function() {
+  var polyRegion = mapSelection.getAreaLatLng(); 
+  var buildings = buildingsLatLong.buildings; 
+  var selectedImagesIndices= [];
+  var index = 0; 
+  var inside = false; 
+
+  if (polyRegion.length != 0) {
+    for (var key in buildings) {
+
+      var buildingLat = buildings[key][0];
+      var buildingLong = buildings[key][1];
+  
+      for (var i = 0, j = polyRegion.length - 1; i < polyRegion.length; j = i++) {
+        var xi = polyRegion[i].lat;
+        var yi = polyRegion[i].lng;
+        var xj = polyRegion[j].lat;
+        var yj = polyRegion[j].lng;
+  
+        var intersect = ((yi > buildingLong) != (yj > buildingLong)) && (buildingLat < (xj - xi) * (buildingLong - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+      }
+  
+      if (inside) {
+        console.log("building is inside selected area: " + key + " index: " + index);
+        selectedImagesIndices.push(index);
+      }
+  
+      index = index + 1; 
+    }
+  }
+  
+  return selectedImagesIndices; 
 }
 
 /**
@@ -1729,8 +1814,17 @@ Selection.prototype.update = function() {
   if (!this.mesh) {
     return;
   }
-  // if there are no selected cells, exit
-  var selected = this.getSelectedImageIndices();
+  
+  console.log("mode " + world.mode);
+
+  var selected = []; 
+  if (world.mode == 'select-leaflet') {
+    selected = leafletSelection.updateSelectedIndices(); 
+    console.log("selected indices " + selected);
+  } else {
+    selected = this.getSelectedImageIndices();
+  }
+  
   this.updateLeafletMarkers(); 
   var elem = document.querySelector('#n-images-selected');
   if (elem) elem.textContent = selected.length;
@@ -2934,14 +3028,20 @@ if (document.getElementById('streetmap') !== null) {
 };
 
 L.control.scale({
-  position: 'bottomright'
+  position: 'bottomleft'
 }).addTo(streetmap);
 
 L.control.zoom({
-  position: 'topright'
+  position: 'bottomleft'
 }).addTo(streetmap);
 
 var layerGroup = L.layerGroup().addTo(streetmap);
+var mapSelection = streetmap.selectAreaFeature.disable();
+streetmap.on('mouseup', function() {
+  if (world.mode == 'select-leaflet') {
+    selection.update();
+  } 
+})
 
 /**
 * Main
@@ -2957,6 +3057,7 @@ var picker = new Picker();
 var modal = new Modal();
 var keyboard = new Keyboard();
 var selection = new Selection();
+var leafletSelection = new LeafletSelection(); 
 var layout = new Layout();
 var world = new World();
 var text = new Text();
